@@ -29,12 +29,6 @@ The **Digital Forensic Evidence Analyzer (DFEA)** is a secure, web-based platfor
 
 ---
 
-## 📸 Screenshots
-
-> *(Add screenshots of your homepage, evidence upload, case management, and hash verification here)*
-
----
-
 ## 🔧 Installation & Setup
 
 1. **Clone the repository**  
