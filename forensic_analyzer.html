@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Forensic Evidence Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.3)); }
+            to { filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.6)); }
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-links a:hover::before {
+            left: 100%;
+        }
+
+        /* Main Content */
+        .main {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            margin-bottom: 2rem;
+            animation: slideInUp 1s ease-out 0.2s both;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #0099cc);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .card p {
+            color: #b0b0b0;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #ffffff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        /* Evidence Management */
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .evidence-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .evidence-item:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .evidence-type {
+            font-size: 0.8rem;
+            color: #00d4ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .evidence-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .evidence-meta {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .file-upload {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .file-upload.drag-over {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            transform: scale(1.02);
+        }
+
+        /* Analysis Section */
+        .analysis-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .analysis-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #0099cc);
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 40, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideInScale 0.3s ease;
+        }
+
+        @keyframes slideInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .analysis-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #00d4ff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Particles Background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(0, 212, 255, 0.5);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">🔍 DFEA</div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showSection('home')">Home</a></li>
+                <li><a href="#" onclick="showSection('dashboard')">Dashboard</a></li>
+                <li><a href="#" onclick="showSection('evidence')">Evidence</a></li>
+                <li><a href="#" onclick="showSection('analysis')">Analysis</a></li>
+                <li><a href="#" onclick="showSection('reports')">Reports</a></li>
+                <li><a href="#" onclick="showSection('settings')">Settings</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main">
+        <!-- Home Section -->
+        <section id="home" class="hero">
+            <div class="container">
+                <h1>Digital Forensic Evidence Analyzer</h1>
+                <p>Professional-grade digital forensics platform for secure evidence storage, analysis, and reporting</p>
+                <button class="btn" onclick="showSection('dashboard')">Get Started</button>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="dashboard">
+            <div class="container">
+                <h2 style="margin-bottom: 2rem; font-size: 2rem;">Dashboard</h2>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-icon">📁</div>
+                        <h3>Total Cases</h3>
+                        <p>Active forensic investigations</p>
+                        <div style="font-size: 2rem; font-weight: bold; color: #00d4ff;">24</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🔍</div>
+                        <h3>Evidence Items</h3>
+                        <p>Stored digital evidence</p>
+                        <div style="font-size: 2rem; font-weight: bold; color: #00d4ff;">156</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">⚡</div>
+                        <h3>Analysis Complete</h3>
+                        <p>Processed this month</p>
+                        <div style="font-size: 2rem; font-weight: bold; color: #00d4ff;">89%</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">📊</div>
+                        <h3>Reports Generated</h3>
+                        <p>Finalized reports</p>
+                        <div style="font-size: 2rem; font-weight: bold; color: #00d4ff;">32</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Recent Activity</h3>
+                    <div style="margin-top: 1rem;">
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <span>Evidence uploaded: Mobile_Device_001.img</span>
+                            <span style="color: #00d4ff;">2 min ago</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <span>Analysis completed: Email_Archive_2024</span>
+                            <span style="color: #00d4ff;">15 min ago</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <span>Report generated: Case_2024_001</span>
+                            <span style="color: #00d4ff;">1 hour ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Evidence Section -->
+        <section id="evidence" class="dashboard">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 2rem;">Evidence Management</h2>
+                    <button class="btn" onclick="openModal('uploadModal')">Upload Evidence</button>
+                </div>
+                
+                <div class="evidence-grid">
+                    <div class="evidence-item" onclick="openModal('evidenceDetailsModal')">
+                        <div class="evidence-type">Mobile Device</div>
+                        <div class="evidence-name">iPhone_13_Backup.tar</div>
+                        <div class="evidence-meta">Size: 2.4 GB | Date: 2024-07-30</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="evidence-type">Hard Drive</div>
+                        <div class="evidence-name">Laptop_Image_001.dd</div>
+                        <div class="evidence-meta">Size: 500 GB | Date: 2024-07-29</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="evidence-type">Network Log</div>
+                        <div class="evidence-name">Router_Logs_Q2.pcap</div>
+                        <div class="evidence-meta">Size: 145 MB | Date: 2024-07-28</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="evidence-type">Email</div>
+                        <div class="evidence-name">Exchange_Archive.pst</div>
+                        <div class="evidence-meta">Size: 8.2 GB | Date: 2024-07-27</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="evidence-type">Database</div>
+                        <div class="evidence-name">Customer_DB.sql</div>
+                        <div class="evidence-meta">Size: 1.1 GB | Date: 2024-07-26</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="evidence-type">Registry</div>
+                        <div class="evidence-name">System_Registry.reg</div>
+                        <div class="evidence-meta">Size: 25 MB | Date: 2024-07-25</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analysis Section -->
+        <section id="analysis" class="dashboard">
+            <div class="container">
+                <h2 style="margin-bottom: 2rem; font-size: 2rem;">Evidence Analysis</h2>
+                
+                <div class="analysis-container">
+                    <div class="analysis-panel">
+                        <h3>File System Analysis</h3>
+                        <p>Analyzing file structures and metadata</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <p style="color: #00d4ff;">75% Complete</p>
+                        <button class="btn" style="margin-top: 1rem;">View Details</button>
+                    </div>
+                    
+                    <div class="analysis-panel">
+                        <h3>Network Traffic Analysis</h3>
+                        <p>Examining network communications</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%;"></div>
+                        </div>
+                        <p style="color: #00d4ff;">45% Complete</p>
+                        <button class="btn" style="margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>Analysis Tools</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <button class="btn">Hash Verification</button>
+                        <button class="btn">Keyword Search</button>
+                        <button class="btn">Timeline Analysis</button>
+                        <button class="btn">Metadata Extraction</button>
+                        <button class="btn">Registry Analysis</button>
+                        <button class="btn">Email Recovery</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="dashboard">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 2rem;">Reports</h2>
+                    <button class="btn" onclick="openModal('reportModal')">Generate Report</button>
+                </div>
+                
+                <div class="evidence-grid">
+                    <div class="evidence-item">
+                        <div class="evidence-type">Forensic Report</div>
+                        <div class="evidence-name">Case_2024_001_Final.pdf</div>
+                        <div class="evidence-meta">Generated: 2024-07-30 | Pages: 45</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="evidence-type">Timeline Report</div>
+                        <div class="evidence-name">Timeline_Analysis_July.pdf</div>
+                        <div class="evidence-meta">Generated: 2024-07-29 | Pages: 23</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="evidence-type">Hash Report</div>
+                        <div class="evidence-name">Hash_Verification_Report.pdf</div>
+                        <div class="evidence-meta">Generated: 2024-07-28 | Pages: 12</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="dashboard">
+            <div class="container">
+                <h2 style="margin-bottom: 2rem; font-size: 2rem;">Settings</h2>
+                
+                <div class="card">
+                    <h3>System Configuration</h3>
+                    <div class="form-group">
+                        <label>Evidence Storage Path</label>
+                        <input type="text" class="form-control" value="/var/forensics/evidence" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Hash Algorithm</label>
+                        <select class="form-control">
+                            <option>SHA-256</option>
+                            <option>MD5</option>
+                            <option>SHA-1</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Auto-backup Interval</label>
+                        <select class="form-control">
+                            <option>Daily</option>
+                            <option>Weekly</option>
+                            <option>Monthly</option>
+                        </select>
+                    </div>
+                    <button class="btn">Save Settings</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('uploadModal')">&times;</button>
+            <h3>Upload Evidence</h3>
+            <form>
+                <div class="form-group">
+                    <label>Case Number</label>
+                    <input type="text" class="form-control" placeholder="Enter case number">
+                </div>
+                <div class="form-group">
+                    <label>Include Evidence</label>
+                    <div style="max-height: 200px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem;"><input type="checkbox" style="margin-right: 0.5rem;"> iPhone_13_Backup.tar</label>
+                        <label style="display: block; margin-bottom: 0.5rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Laptop_Image_001.dd</label>
+                        <label style="display: block; margin-bottom: 0.5rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Router_Logs_Q2.pcap</label>
+                        <label style="display: block; margin-bottom: 0.5rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Exchange_Archive.pst</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Report Format</label>
+                    <select class="form-control">
+                        <option>PDF</option>
+                        <option>HTML</option>
+                        <option>Word Document</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="margin-top: 1rem;">Generate Report</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Current section tracker
+        let currentSection = 'home';
+
+        // Initialize particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Show section function
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                targetSection.classList.add('active');
+                
+                // Add entrance animation
+                targetSection.style.opacity = '0';
+                targetSection.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    targetSection.style.transition = 'all 0.5s ease';
+                    targetSection.style.opacity = '1';
+                    targetSection.style.transform = 'translateY(0)';
+                }, 10);
+            }
+            
+            currentSection = sectionName;
+            
+            // Update active nav link
+            const navLinks = document.querySelectorAll('.nav-links a');
+            navLinks.forEach(link => {
+                link.style.background = 'none';
+            });
+            
+            const activeLink = document.querySelector(`[onclick="showSection('${sectionName}')"]`);
+            if (activeLink) {
+                activeLink.style.background = 'rgba(0, 212, 255, 0.2)';
+            }
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // File upload handling
+        function setupFileUpload() {
+            const fileUpload = document.querySelector('.file-upload');
+            const fileInput = document.getElementById('fileInput');
+
+            if (fileUpload && fileInput) {
+                // Drag and drop functionality
+                fileUpload.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    fileUpload.classList.add('drag-over');
+                });
+
+                fileUpload.addEventListener('dragleave', () => {
+                    fileUpload.classList.remove('drag-over');
+                });
+
+                fileUpload.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fileUpload.classList.remove('drag-over');
+                    
+                    const files = e.dataTransfer.files;
+                    handleFiles(files);
+                });
+
+                fileInput.addEventListener('change', (e) => {
+                    handleFiles(e.target.files);
+                });
+            }
+        }
+
+        function handleFiles(files) {
+            const fileUpload = document.querySelector('.file-upload');
+            const fileList = document.createElement('div');
+            fileList.style.marginTop = '1rem';
+            fileList.style.textAlign = 'left';
+
+            Array.from(files).forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.style.padding = '0.5rem';
+                fileItem.style.background = 'rgba(0, 212, 255, 0.1)';
+                fileItem.style.borderRadius = '4px';
+                fileItem.style.marginBottom = '0.5rem';
+                fileItem.innerHTML = `
+                    <strong>${file.name}</strong><br>
+                    <small>Size: ${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                `;
+                fileList.appendChild(fileItem);
+            });
+
+            // Replace the upload area content temporarily
+            const originalContent = fileUpload.innerHTML;
+            fileUpload.innerHTML = `
+                <div style="font-size: 2rem; margin-bottom: 1rem;">✅</div>
+                <p style="color: #00d4ff;">Files selected successfully!</p>
+                ${fileList.outerHTML}
+            `;
+
+            // Restore original content after 3 seconds
+            setTimeout(() => {
+                fileUpload.innerHTML = originalContent;
+                setupFileUpload(); // Re-setup event listeners
+            }, 3000);
+        }
+
+        // Simulate analysis progress
+        function simulateAnalysis() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            
+            progressBars.forEach((bar, index) => {
+                let progress = 0;
+                const targetProgress = Math.random() * 100;
+                
+                const interval = setInterval(() => {
+                    progress += 2;
+                    bar.style.width = Math.min(progress, targetProgress) + '%';
+                    
+                    if (progress >= targetProgress) {
+                        clearInterval(interval);
+                    }
+                }, 100);
+            });
+        }
+
+        // Form submission handlers
+        function setupFormHandlers() {
+            const forms = document.querySelectorAll('form');
+            
+            forms.forEach(form => {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    // Show loading state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    
+                    submitBtn.innerHTML = '<span class="loading"></span> Processing...';
+                    submitBtn.disabled = true;
+                    
+                    // Simulate processing
+                    setTimeout(() => {
+                        submitBtn.textContent = '✅ Success!';
+                        submitBtn.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
+                        
+                        setTimeout(() => {
+                            submitBtn.textContent = originalText;
+                            submitBtn.style.background = 'linear-gradient(135deg, #00d4ff, #0099cc)';
+                            submitBtn.disabled = false;
+                            
+                            // Close modal if in one
+                            const modal = submitBtn.closest('.modal');
+                            if (modal) {
+                                modal.classList.remove('active');
+                                document.body.style.overflow = 'auto';
+                            }
+                        }, 2000);
+                    }, 2000);
+                });
+            });
+        }
+
+        // Evidence item interactions
+        function setupEvidenceInteractions() {
+            const evidenceItems = document.querySelectorAll('.evidence-item');
+            
+            evidenceItems.forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    item.style.transform = 'translateY(-3px) scale(1.02)';
+                });
+                
+                item.addEventListener('mouseleave', () => {
+                    item.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        }
+
+        // Real-time clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const dateString = now.toLocaleDateString();
+            
+            // Add clock to header if it doesn't exist
+            let clockElement = document.querySelector('.nav-clock');
+            if (!clockElement) {
+                clockElement = document.createElement('div');
+                clockElement.className = 'nav-clock';
+                clockElement.style.color = '#b0b0b0';
+                clockElement.style.fontSize = '0.9rem';
+                document.querySelector('.nav').appendChild(clockElement);
+            }
+            
+            clockElement.innerHTML = `${timeString}<br><small>${dateString}</small>`;
+        }
+
+        // Initialize dashboard stats animation
+        function animateDashboardStats() {
+            const statNumbers = document.querySelectorAll('.card div[style*="font-size: 2rem"]');
+            
+            statNumbers.forEach(stat => {
+                const finalValue = parseInt(stat.textContent) || 0;
+                let currentValue = 0;
+                const increment = finalValue / 50;
+                
+                const counter = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= finalValue) {
+                        stat.textContent = finalValue + (stat.textContent.includes('%') ? '%' : '');
+                        clearInterval(counter);
+                    } else {
+                        stat.textContent = Math.floor(currentValue) + (stat.textContent.includes('%') ? '%' : '');
+                    }
+                }, 50);
+            });
+        }
+
+        // Keyboard shortcuts
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case '1':
+                            e.preventDefault();
+                            showSection('home');
+                            break;
+                        case '2':
+                            e.preventDefault();
+                            showSection('dashboard');
+                            break;
+                        case '3':
+                            e.preventDefault();
+                            showSection('evidence');
+                            break;
+                        case '4':
+                            e.preventDefault();
+                            showSection('analysis');
+                            break;
+                        case '5':
+                            e.preventDefault();
+                            showSection('reports');
+                            break;
+                        case 'u':
+                            e.preventDefault();
+                            openModal('uploadModal');
+                            break;
+                    }
+                }
+                
+                // Escape to close modals
+                if (e.key === 'Escape') {
+                    const activeModal = document.querySelector('.modal.active');
+                    if (activeModal) {
+                        activeModal.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+                    }
+                }
+            });
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            setupFileUpload();
+            setupFormHandlers();
+            setupEvidenceInteractions();
+            setupKeyboardShortcuts();
+            updateClock();
+            
+            // Update clock every second
+            setInterval(updateClock, 1000);
+            
+            // Simulate analysis progress every 10 seconds
+            setInterval(simulateAnalysis, 10000);
+            
+            // Show dashboard by default after 2 seconds
+            setTimeout(() => {
+                if (currentSection === 'home') {
+                    showSection('dashboard');
+                    animateDashboardStats();
+                }
+            }, 2000);
+            
+            // Add some sample notifications
+            setTimeout(() => {
+                showNotification('New evidence uploaded successfully', 'success');
+            }, 5000);
+            
+            setTimeout(() => {
+                showNotification('Analysis completed for Case_2024_001', 'info');
+            }, 8000);
+        });
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === 'success' ? 'rgba(0, 255, 136, 0.1)' : 'rgba(0, 212, 255, 0.1)'};
+                border: 1px solid ${type === 'success' ? '#00ff88' : '#00d4ff'};
+                border-radius: 8px;
+                padding: 1rem;
+                color: white;
+                z-index: 3000;
+                transform: translateX(400px);
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                max-width: 300px;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="font-size: 1.2rem;">${type === 'success' ? '✅' : 'ℹ️'}</div>
+                    <div>${message}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 5000);
+        }
+
+        // Click outside modal to close
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(5, 5, 5, 0.98)';
+                header.style.borderBottom = '1px solid rgba(0, 212, 255, 0.3)';
+            } else {
+                header.style.background = 'rgba(10, 10, 10, 0.95)';
+                header.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+            }
+        });
+    </script>
+</body>
+</html> class="form-control" placeholder="Enter case number">
+                </div>
+                <div class="form-group">
+                    <label>Evidence Type</label>
+                    <select class="form-control">
+                        <option>Mobile Device</option>
+                        <option>Hard Drive</option>
+                        <option>Network Log</option>
+                        <option>Email Archive</option>
+                        <option>Database</option>
+                        <option>Registry File</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-control" rows="3" placeholder="Evidence description"></textarea>
+                </div>
+                <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+                    <p>Click to select files or drag and drop</p>
+                    <input type="file" id="fileInput" style="display: none;" multiple>
+                </div>
+                <button type="submit" class="btn" style="margin-top: 1rem;">Upload Evidence</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Evidence Details Modal -->
+    <div id="evidenceDetailsModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('evidenceDetailsModal')">&times;</button>
+            <h3>Evidence Details</h3>
+            <div style="margin-top: 1rem;">
+                <p><strong>Name:</strong> iPhone_13_Backup.tar</p>
+                <p><strong>Type:</strong> Mobile Device</p>
+                <p><strong>Size:</strong> 2.4 GB</p>
+                <p><strong>Hash (SHA-256):</strong> a1b2c3d4e5f6...</p>
+                <p><strong>Uploaded:</strong> 2024-07-30 14:23:45</p>
+                <p><strong>Status:</strong> <span style="color: #00d4ff;">Analysis Complete</span></p>
+                <h4 style="margin-top: 2rem;">Analysis Results</h4>
+                <ul>
+                    <li>147 photos recovered</li>
+                    <li>2,340 text messages extracted</li>
+                    <li>89 contacts found</li>
+                    <li>Location data available</li>
+                </ul>
+                <button class="btn" style="margin-top: 1rem;">Download Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('reportModal')">&times;</button>
+            <h3>Generate Report</h3>
+            <form>
+                <div class="form-group">
+                    <label>Report Type</label>
+                    <select class="form-control">
+                        <option>Comprehensive Forensic Report</option>
+                        <option>Timeline Analysis</option>
+                        <option>Hash Verification Report</option>
+                        <option>Evidence Summary</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Case Number</label>
+                    <input type="text"
