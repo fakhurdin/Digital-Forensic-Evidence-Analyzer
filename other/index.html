@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Digital Forensic Evidence Analyzer</title>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">🔍 DFEA</div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showSection('home')">Home</a></li>
+                <li><a href="#" onclick="showSection('dashboard')">Dashboard</a></li>
+                <li><a href="#" onclick="showSection('evidence')">Evidence</a></li>
+                <li><a href="#" onclick="showSection('analysis')">Analysis</a></li>
+                <li><a href="#" onclick="showSection('reports')">Reports</a></li>
+                <li><a href="#" onclick="showSection('settings')">Settings</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main">
+        <!-- Home Section -->
+        <section id="home" class="hero">
+            <div class="container">
+                <h1>Digital Forensic Evidence Analyzer</h1>
+                <p>Professional-grade digital forensics platform for secure evidence storage, analysis, and reporting</p>
+                <button class="btn" onclick="showSection('dashboard')">Get Started</button>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="dashboard">
+            <div class="container">
+                <h2 style="margin-bottom: 2rem; font-size: 2rem;">Dashboard</h2>
+                <div class="dashboard-grid">
+                    <!-- Add dashboard cards here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Evidence Section -->
+        <section id="evidence" class="dashboard">
+            <div class="container">
+                <h2>Evidence</h2>
+                <!-- Evidence items here -->
+            </div>
+        </section>
+
+        <!-- Analysis Section -->
+        <section id="analysis" class="dashboard">
+            <div class="container">
+                <h2>Analysis</h2>
+                <!-- Analysis content here -->
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="dashboard">
+            <div class="container">
+                <h2>Reports</h2>
+                <!-- Reports list here -->
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="dashboard">
+            <div class="container">
+                <h2>Settings</h2>
+                <!-- Settings content here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals (Upload, Evidence Details, Report Generation, etc.) -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('uploadModal')">&times;</button>
+            <h3>Upload Evidence</h3>
+            <!-- Upload form -->
+        </div>
+    </div>
+
+    <div id="evidenceDetailsModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('evidenceDetailsModal')">&times;</button>
+            <h3>Evidence Details</h3>
+            <!-- Evidence info -->
+        </div>
+    </div>
+
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('reportModal')">&times;</button>
+            <h3>Generate Report</h3>
+            <!-- Report generation form -->
+        </div>
+    </div>
+
+    <script src="js/scripts.js"></script>
+</body>
+</html>
